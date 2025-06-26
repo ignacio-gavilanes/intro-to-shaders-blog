@@ -1,11 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
 
+$background: #242424;
+$text-primary: #FFFFFF;
+
 :root {
   font-family: 'Inter', system-ui, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  background-color: #242424;
+  background-color: $background;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -24,4 +27,5 @@ body {
   place-items: center;
   min-width: 100vw;
   min-height: 100vh;
+  color: $text-primary;
 }

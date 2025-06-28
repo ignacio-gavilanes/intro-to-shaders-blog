@@ -1,15 +1,32 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Light.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Black.woff2') format('woff2');
+  font-weight: 900;
+  font-style: normal;
+  font-display: block;
+}
 
 $background: #242424;
 $text-primary: #FFFFFF;
 
 :root {
-  font-family: 'Inter', system-ui, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
   background-color: $background;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -23,6 +40,7 @@ $text-primary: #FFFFFF;
 }
 
 body {
+  font-family: 'Inter', system-ui, sans-serif;
   display: flex;
   place-items: center;
   min-width: 100vw;
@@ -30,8 +48,34 @@ body {
   color: $text-primary;
 }
 
+#app {
+  position: relative;
+}
+
 #webgl {
   display: block;
   width: 100%;
   height: 100%;
+  z-index: 1;
+}
+
+#contact {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  color: black;
+  font-size: 14px;
+  z-index: 2;
+}
+
+#loading-screen {
+  font-weight: 300;
+  color: black;
+  position: fixed;
+  inset: 0;
+  background: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3;
 }

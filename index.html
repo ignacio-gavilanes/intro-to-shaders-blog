@@ -2,16 +2,23 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
+    <link rel="preload" href="/fonts/Inter-Light.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="/fonts/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="/fonts/Inter-Black.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="stylesheet" href="/src/style.scss" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Intro To Shaders</title>
   </head>
   <body>
     <div id="app">
+      <div id="loading-screen">
+        Loading...
+      </div>
       <canvas id="webgl"></canvas>
-       <div style="position: absolute; bottom: 20px; right: 20px; color: black; font-size: 14px">
-          intro-to-shaders-blog
-        </div>
+      <div id="contact">
+        intro-to-shaders-blog
+      </div>
     </div>
     <script type="module" src="/src/main.js"></script>
   </body>

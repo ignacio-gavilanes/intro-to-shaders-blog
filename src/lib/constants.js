@@ -42,5 +42,4 @@ export const BASE_ROTATION_SPEED = 0.003; // radians per frame
 export const MODEL_MANUAL_ROTATION_SETTINGS = {
   DAMPING: 0.95, // How quickly rotation slows down
   SENSITIVITY: 0.005, // How much mouse movement affects rotation
-  MINIMUM_VELOCITY: 0.00001, // Threshold to stop rotation
 }

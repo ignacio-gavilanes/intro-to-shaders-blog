@@ -4,6 +4,8 @@ import Stats from 'stats.js';
 import getSceneSize from './lib/helpers/getSceneSize';
 import rotationSpeeds from './lib/helpers/getRandomSpeed';
 import { Text } from "troika-three-text";
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
 import {
   DEVICE_PIXEL_RATIO,
   ROOM_SIZE,
@@ -34,6 +36,25 @@ export function initScene() {
 
   // Create the SCENE
   const scene = new THREE.Scene();
+
+  // LOAD MODEL
+  const gltfLoader = new GLTFLoader();
+  let model; // save reference to rotate later
+
+  gltfLoader.load(
+    '/model/marble_bust.gltf',
+    (gltf) => {
+      model = gltf.scene.children[0];
+      scene.add(model);
+
+      model.position.y = -1.25;
+      model.position.z = 1.25;
+      model.rotation.y = 3.25;
+      model.scale.setScalar(6); // Shorthand for set(6, 6, 6)
+    },
+    (progress) => console.log('Loading progress:', progress),
+    (err) => console.error('Error loading model:', err)
+  );
 
   // CAMERA
   const camera = new THREE.PerspectiveCamera(
@@ -74,15 +95,6 @@ export function initScene() {
 
   const room = new THREE.Mesh(roomGeometry, roomMaterial);
   scene.add(room);
-
-  // BOX OBJECT: Placeholder for the model --------------------------------------------
-  const boxSize = { x: 0.8, y: 0.8, z: 0.8 };
-  const boxGeometry = new THREE.BoxGeometry(boxSize.x, boxSize.y, boxSize.z);
-  const boxMaterial = new THREE.MeshStandardMaterial({ color: 0x00aaff });
-  const box = new THREE.Mesh(boxGeometry, boxMaterial);
-  box.position.set(0, -0.5 + boxSize.y / 2, 2);
-  scene.add(box);
-  // -----------------------------------------------------------------------------------
 
   // RESIZE HANDLING
   window.addEventListener('resize', () => {
@@ -142,12 +154,14 @@ export function initScene() {
     // Keep camera looking at the center
     camera.lookAt(CAMERA.LOOK_AT_TARGET);
 
-    // BOX OBJECT RANDOM ROTATION
+    // MODEL RANDOM ROTATION
     const {x, y, z} = rotationSpeeds
 
-    box.rotation.x += x;
-    box.rotation.y += y;
-    box.rotation.z += z;
+    if (model) {
+      model.rotation.x += x;
+      model.rotation.y += y;
+      model.rotation.z += z;
+    }
 
     renderer.render(scene, camera);
     stats.end();

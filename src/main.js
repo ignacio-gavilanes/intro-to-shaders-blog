@@ -1,5 +1,7 @@
 import { initScene } from './scene';
 
+import handleLowBatteryWarning from './lib/helpers/handleLowBatteryWarning';
+
 import './style.scss';
 
 const loadingScreen = document.getElementById('loading-screen');
@@ -13,5 +15,7 @@ async function start() {
     loadingScreen.style.display = 'none';
   }
 }
+
+handleLowBatteryWarning();
 
 start();

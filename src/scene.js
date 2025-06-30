@@ -1,17 +1,16 @@
 import * as THREE from 'three';
-import GUI from 'lil-gui';
 import Stats from 'stats.js';
-import { Text } from "troika-three-text";
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 import getSceneSize from './lib/helpers/getSceneSize';
 import rotationSpeeds from './lib/helpers/getRandomSpeed';
 import updateCursorType from './lib/helpers/updateCursorType';
 import createYRotationQuaternion from './lib/helpers/createYRotationQuaternion';
+import initGUI from './lib/helpers/initGUI';
+import getConfiguredWallPlanes from './lib/helpers/getConfiguredWallPlanes';
 
 import {
   DEVICE_PIXEL_RATIO,
-  ROOM_SIZE,
   CAMERA,
   PARALLAX_STRENGTH,
   POINT_LIGHT,
@@ -24,7 +23,10 @@ const stats = new Stats();
 document.body.appendChild(stats.dom);
 
 export function initScene() {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => { // Promise to track loading state via lodingManager
+    // Loading manager to group all asset loading into a single lifecycle
+    const loadingManager = new THREE.LoadingManager;
+
     // Get the CANVAS element from ../index.html
     const canvas = document.querySelector('#webgl');
 
@@ -32,26 +34,26 @@ export function initScene() {
     const scene = new THREE.Scene();
 
     // LOAD MODEL
-    const gltfLoader = new GLTFLoader();
+    const gltfLoader = new GLTFLoader(loadingManager);
     let model; // save reference to rotate later
 
     gltfLoader.load(
       '/model/marble_bust.gltf',
       (gltf) => {
         model = gltf.scene.children[0];
-        scene.add(model);
+        model.castShadow = true;
+        model.receiveShadow = true;
 
         model.position.y = -1.25;
         model.position.z = 1.25;
         model.rotation.y = 3.25;
+
         model.scale.setScalar(6); // Shorthand for set(6, 6, 6)
 
-        resolve()
+        scene.add(model);
       },
       undefined,
-      (err) => {
-        reject(err)
-      }
+      (err) => console.log('error', err),
     );
 
     // CAMERA
@@ -68,31 +70,42 @@ export function initScene() {
     // RENDERER
     const renderer = new THREE.WebGLRenderer({
       canvas,
-      antialias: true, // Looks better but slightly less performant
+      // antialias: true, // Performance-sensitive: Looks better but slightly less performant
     });
-
+    
     const { width, height } = getSceneSize();
 
     renderer.setSize(width, height);
     renderer.setPixelRatio(DEVICE_PIXEL_RATIO);
     renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFShadowMap; // Performance-sensitive: This is a better (not default) shadow algorithm.
 
     // LIGHTING
-    const ambientLight = new THREE.AmbientLight(AMBIENT_LIGHT.COLOR, AMBIENT_LIGHT.INTENSITY);
+    const ambientLight = new THREE.AmbientLight(AMBIENT_LIGHT.COLOR, AMBIENT_LIGHT.INTENSITY); 
     scene.add(ambientLight);
 
     const pointLight = new THREE.PointLight(POINT_LIGHT.COLOR, POINT_LIGHT.INTENSITY);
     pointLight.position.copy(POINT_LIGHT.POSITION);
-    scene.add(pointLight);
+    pointLight.castShadow = true
+    pointLight.shadow.mapSize.width = 2048 // Performance-sensitive: Was 512 Originally. Change to 1024 if performance becomes an issue.
+    pointLight.shadow.mapSize.height = 2048 // Performance-sensitive: Was 512 Originally. Change to 1024 if performance becomes an issue.
+    pointLight.shadow.camera.near = 0.5
+    pointLight.shadow.camera.far = 13
+    pointLight.shadow.bias = -0.005;
 
-    // ROOM as a box with inward-facing walls
-    const roomGeometry = new THREE.BoxGeometry(ROOM_SIZE.WIDTH, ROOM_SIZE.HEIGHT, ROOM_SIZE.DEPTH);
-    const roomMaterial = new THREE.MeshStandardMaterial({
-      side: THREE.BackSide,
-    });
+    scene.add(pointLight, ambientLight);
 
-    const room = new THREE.Mesh(roomGeometry, roomMaterial);
-    scene.add(room);
+    // Textures for 5 planes with inward-facing walls
+    const {
+      leftWall,
+      rightWall,
+      ceiling,
+      floor,
+      backWall,
+      wallMaterials,
+    } = getConfiguredWallPlanes(loadingManager)
+
+    scene.add(leftWall, rightWall, ceiling, floor, backWall);
 
     // RESIZE HANDLING
     window.addEventListener('resize', () => {
@@ -164,25 +177,23 @@ export function initScene() {
       previousMousePosition.set(event.clientX, event.clientY);
     });
 
-    /* BACKGROUND TEXT -----------------------------------------------------------------------------------------------------
-    ** NOTE:
-    ** The reason for the text is to have an heterogenous back wall so that refractions would look cool.
-    ** A different approach could be just adding a texture like a brick/wood wall.
-    */
-    const myText = new Text();
-    myText.text = '/PLACEHOLDER';
-    myText.fontSize = 1;
-    myText.rotation.y = Math.PI;
-    myText.position.set(0, 0, (ROOM_SIZE.DEPTH / 2) - 1); // -1 to avoid z-fighting.
-    myText.color = "#000000";
-    myText.anchorX = 'center';
-    myText.anchorY = 'middle';
-    myText.sync(); // Sync layout before rendering
-    scene.add(myText);
-    // BACKGROUND TEXT END --------------------------------------------------------------------------------------------------
-
     // STATS panel
     stats.showPanel(0); // NOTE: 0 = fps, 1 = ms, 2 = memory
+
+    loadingManager.onLoad = () => {
+      // Initialize lil-gui since all assets were loaded
+      initGUI({
+        camera,
+        ambientLight,
+        pointLight,
+        wallMaterials,
+        model,
+      });
+
+      resolve();
+    };
+
+    loadingManager.onError = (err) => reject(err);
 
     // RENDERER LOOP
     renderer.setAnimationLoop(() => {
@@ -199,7 +210,7 @@ export function initScene() {
       camera.lookAt(CAMERA.LOOK_AT_TARGET);
 
       // MODEL RANDOM ROTATION
-      const {x, y, z} = rotationSpeeds
+      const { x, y, z } = rotationSpeeds
 
       if (model) {
         // AUTOMATIC ROTATION
@@ -217,6 +228,7 @@ export function initScene() {
           velocityY *= MODEL_MANUAL_ROTATION_SETTINGS.DAMPING;
         }
       }
+
       renderer.render(scene, camera);
       stats.end();
     });

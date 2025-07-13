@@ -49,10 +49,6 @@ const getConfiguredWallPlanes = ({
   rightWall.position.set(-halfWidth, 0, 0);
   rightWall.rotation.y = Math.PI / 2;
 
-  const ceiling = createWallPlane(ROOM_SIZE.WIDTH, ROOM_SIZE.DEPTH, wallMaterials.ceiling);
-  ceiling.position.set(0, halfHeight, 0);
-  ceiling.rotation.x = Math.PI / 2;
-
   const floor = createWallPlane(ROOM_SIZE.WIDTH, ROOM_SIZE.DEPTH, wallMaterials.floor);
   floor.position.set(0, -halfHeight, 0);
   floor.rotation.x = -Math.PI / 2;
@@ -64,7 +60,6 @@ const getConfiguredWallPlanes = ({
   return {
     leftWall,
     rightWall,
-    ceiling,
     floor,
     backWall,
     wallMaterials,

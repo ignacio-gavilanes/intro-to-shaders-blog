@@ -1,4 +1,4 @@
-<!doctype html>
+<!-- <!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -15,6 +15,62 @@
       <div id="loading-screen">
         Loading...
       </div>
+      <canvas id="webgl"></canvas>
+      <div id="contact">
+        intro-to-shaders-blog
+      </div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html> -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
+    <link rel="preload" href="/fonts/Inter-Light.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="/fonts/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="/fonts/Inter-Black.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="stylesheet" href="/src/style.scss" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Intro To Shaders</title>
+  </head>
+  <body>
+    <div id="app">
+      <!-- Loading Screen -->
+      <div id="loading-screen" class="loading-screen">
+        <!-- Loading State (Initially visible) -->
+        <div class="loading-container">
+          <div class="spinner"></div>
+          <div class="loading-text">Loading...</div>
+        </div>
+        
+        <!-- Success State (Initially hidden) -->
+        <div class="success-container" style="display: none;">
+          <div class="ready-item">
+            <span class="checkmark">✓</span>
+            <span class="ready-text">Ready</span>
+          </div>
+          <div class="ready-item">
+            <span class="checkmark">✓</span>
+            <span class="ready-text">Ready</span>
+          </div>
+          <div class="ready-item">
+            <span class="checkmark">✓</span>
+            <span class="ready-text">Ready</span>
+          </div>
+          <div class="ready-item">
+            <span class="checkmark">✓</span>
+            <span class="ready-text">Ready</span>
+          </div>
+          <div class="ready-item">
+            <span class="checkmark">✓</span>
+            <span class="ready-text">Ready</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Scene -->
       <canvas id="webgl"></canvas>
       <div id="contact">
         intro-to-shaders-blog

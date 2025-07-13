@@ -4,6 +4,8 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 import getSceneSize from './lib/helpers/getSceneSize';
 import initGUI from './lib/helpers/initGUI';
+import toggleShader from './lib/helpers/toggleShader';
+import applyStaticNoiseShader from './lib/helpers/applyStaticNoiseShader.js';
 import getConfiguredWallPlanes from './lib/helpers/getConfiguredWallPlanes';
 
 import {
@@ -24,18 +26,21 @@ export function initScene() {
     const scene = new THREE.Scene();
     const gltfLoader = new GLTFLoader(loadingManager);
 
+    document.getElementById('toggle-shader-btn').addEventListener('click', () => {
+      toggleShader(screenMesh);
+    });
+
     let model;
     let screenMesh;
+    let originalMaterial;
 
     gltfLoader.load(
       '/model/Television_01_4k.gltf',
       (gltf) => {
-        console.log(gltf);
         model = gltf.scene;
 
         model.traverse((child) => {
           if (child.isMesh) {
-            console.log('Found mesh:', child.name, child);
             child.castShadow = true;
             child.receiveShadow = true;
           }
@@ -44,52 +49,9 @@ export function initScene() {
         screenMesh = model.getObjectByName('Screen');
 
         if (screenMesh) {
-          screenMesh.material = screenMesh.material.clone();
-          screenMesh.material.userData.uTime = { value: 0 };
-          screenMesh.material.userData.resolution = {
-            value: new THREE.Vector2(window.innerWidth, window.innerHeight),
-          };
-
-          screenMesh.material.onBeforeCompile = (shader) => {
-            shader.uniforms.uTime = screenMesh.material.userData.uTime;
-            shader.uniforms.resolution = screenMesh.material.userData.resolution;
-
-            shader.fragmentShader = `
-              uniform float uTime;
-              uniform vec2 resolution;
-
-              float randCustom(vec2 co) {
-                return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
-              }
-
-              ${shader.fragmentShader}
-            `;
-
-            shader.fragmentShader = shader.fragmentShader.replace(
-              '#include <dithering_fragment>',
-              `
-                vec2 uv = gl_FragCoord.xy / resolution.xy;
-                float noise = randCustom(uv * uTime * 60.0);
-
-                // base color with noise
-                vec3 screenColor = vec3(noise);
-
-                // simulate center light emission
-                float vignette = smoothstep(0.8, 0.2, distance(uv, vec2(0.5)));
-                screenColor *= 1.0 + (1.0 - vignette) * 0.6;
-
-                // darken edges to simulate CRT shadow
-                float edgeShadow = smoothstep(0.5, 0.8, distance(uv, vec2(0.5)));
-                screenColor *= 1.0 - edgeShadow * 0.4;
-
-                gl_FragColor = vec4(screenColor, 1.0);
-
-                #include <dithering_fragment>
-              `
-            );
-
-            screenMesh.material.userData.shader = shader;
-          };
+          originalMaterial = screenMesh.material.clone();
+          screenMesh.material = originalMaterial.clone();
+          applyStaticNoiseShader(screenMesh.material);
         }
 
         model.position.y = -5;
@@ -100,7 +62,7 @@ export function initScene() {
         scene.add(model);
       },
       undefined,
-      (err) => console.error('GLTF load error:', err),
+      (err) => console.log('GLTF load error:', err),
     );
 
     const camera = new THREE.PerspectiveCamera(

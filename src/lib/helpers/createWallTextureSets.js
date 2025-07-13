@@ -26,11 +26,10 @@ const createWallTextureSets = (loadingManager) => {
   });
 
   const wallTextureSets = {
-    left: loadWallTextures('/textures/climbing_wall', 'climbing_wall'),
-    right: loadWallTextures('/textures/climbing_wall_base', 'climbing_wall_base'),
-    ceiling: loadWallTextures('/textures/climbing_wall_02', 'climbing_wall_02'),
-    floor: loadWallTextures('/textures/climbing_wall_base', 'climbing_wall_base'),
-    back: loadWallTextures('/textures/climbing_wall', 'climbing_wall'),
+    left: loadWallTextures('/textures/broken_brick_wall', 'broken_brick_wall'),
+    right: loadWallTextures('/textures/broken_brick_wall', 'broken_brick_wall'),
+    floor: loadWallTextures('/textures/worn_tile_floor', 'worn_tile_floor'),
+    back: loadWallTextures('/textures/broken_brick_wall', 'broken_brick_wall'),
   };
 
   return wallTextureSets;

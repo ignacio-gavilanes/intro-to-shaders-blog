@@ -13,13 +13,13 @@ export const ROOM_SIZE = {
 
 export const CAMERA = {
   SETTINGS: {
-    FOV: 50,
+    FOV: 32,
     ASPECT: SCENE_SIZE.WIDTH / SCENE_SIZE.HEIGHT,
     NEAR: 0.1,
     FAR: 100,
   },
-  INITIAL_POSITION: new THREE.Vector3(0, 0, -10),
-  LOOK_AT_TARGET: new THREE.Vector3(0, 0, 0),
+  INITIAL_POSITION: new THREE.Vector3(0, -3, -10),
+  LOOK_AT_TARGET: new THREE.Vector3(0, -3, 0),
 };
 
 export const AMBIENT_LIGHT = {
@@ -39,12 +39,7 @@ export const DEVICE_PIXEL_RATIO = Math.min(window.devicePixelRatio, 2);
 
 export const BASE_ROTATION_SPEED = 0.003; // radians per frame
 
-export const MODEL_MANUAL_ROTATION_SETTINGS = {
-  DAMPING: 0.95, // How quickly rotation slows down
-  SENSITIVITY: 0.005, // How much mouse movement affects rotation
-};
-
-export const WALLS = ['left', 'right', 'ceiling', 'floor', 'back'];
+export const WALLS = ['left', 'right', 'floor', 'back'];
 
 export const BASE_MATERIAL_PROPERTIES_PER_WALL = {
   left: {
@@ -60,13 +55,6 @@ export const BASE_MATERIAL_PROPERTIES_PER_WALL = {
     aoMapIntensity: 0.5,
     displacementScale: 0.05,
     normalScale: new THREE.Vector2(1.57, 1.0),
-  },
-  ceiling: {
-    metalness: 0.3,
-    roughness: 1,
-    aoMapIntensity: 1,
-    displacementScale: 0.05,
-    normalScale: new THREE.Vector2(0.4, 1.5),
   },
   floor: {
     metalness: 0.3,
